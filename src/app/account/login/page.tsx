@@ -7,10 +7,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   function getUsers() {
-    try { return JSON.parse(localStorage.getItem("legacy_users") || "[]"); }
+    try { return JSON.parse(localStorage.getItem("account_users") || "[]"); }
     catch { return []; }
   }
-
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -24,10 +23,9 @@ export default function LoginPage() {
       return;
     }
 
-    localStorage.setItem('legacy_session', JSON.stringify({ name: user.name, email: user.email, role: user.role }));
-    if (user.role === 'admin') router.push('/legacy/admin');
-    else if (user.role === 'employee') router.push('/legacy/employee');
-    else router.push('/legacy/client');
+    localStorage.setItem('account_session', JSON.stringify({ name: user.name, email: user.email }));
+    try { window.dispatchEvent(new Event('account_session_changed')); } catch {}
+    router.push('/account/appointments');
   }
 
   return (
@@ -46,7 +44,7 @@ export default function LoginPage() {
           <input name="password" type="password" placeholder="Password" required style={{ width:'100%', padding:12, marginBottom:12, borderRadius:6, border:'1px solid #dfe6ea' }} />
           <button type="submit" style={{ width:'100%', padding:12, background:'#1f6feb', color:'#fff', border:'none', borderRadius:6 }}>Login</button>
         </form>
-        <p style={{ textAlign:'center', marginTop:12, color:'#666' }}>Don't have an account? <a href="/legacy/register" style={{ color: '#1f6feb', fontWeight:600 }}>Register</a></p>
+        <p style={{ textAlign:'center', marginTop:12, color:'#666' }}>Don't have an account? <a href="/account/register" style={{ color: '#1f6feb', fontWeight:600 }}>Register</a></p>
       </div>
     </div>
   );

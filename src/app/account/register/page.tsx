@@ -7,7 +7,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
 
   function getUsers() {
-    try { return JSON.parse(localStorage.getItem("legacy_users") || "[]"); }
+    try { return JSON.parse(localStorage.getItem("account_users") || "[]"); }
     catch { return []; }
   }
 
@@ -17,7 +17,6 @@ export default function RegisterPage() {
     const name = fd.get("name")?.toString() || "";
     const email = fd.get("email")?.toString() || "";
     const password = fd.get("password")?.toString() || "";
-    const role = fd.get("role")?.toString() || "";
 
     const users = getUsers();
     if (users.find((u: any) => u.email === email)) {
@@ -25,13 +24,11 @@ export default function RegisterPage() {
       return;
     }
 
-    users.push({ name, email, password, role });
-    localStorage.setItem("legacy_users", JSON.stringify(users));
-    localStorage.setItem('legacy_session', JSON.stringify({ name, email, role }));
-
-    if (role === 'admin') router.push('/legacy/admin');
-    else if (role === 'employee') router.push('/legacy/employee');
-    else router.push('/legacy/client');
+    users.push({ name, email, password });
+    localStorage.setItem("account_users", JSON.stringify(users));
+    localStorage.setItem('account_session', JSON.stringify({ name, email }));
+    try { window.dispatchEvent(new Event('account_session_changed')); } catch {}
+    router.push('/account/appointments');
   }
 
   return (
@@ -49,15 +46,9 @@ export default function RegisterPage() {
           <input name="name" type="text" placeholder="Name" required style={{ width:'100%', padding:12, marginBottom:12, borderRadius:6, border:'1px solid #dfe6ea' }} />
           <input name="email" type="email" placeholder="Email" required style={{ width:'100%', padding:12, marginBottom:12, borderRadius:6, border:'1px solid #dfe6ea' }} />
           <input name="password" type="password" placeholder="Password" required style={{ width:'100%', padding:12, marginBottom:12, borderRadius:6, border:'1px solid #dfe6ea' }} />
-          <select name="role" defaultValue="" style={{ width:'100%', padding:12, marginBottom:12, borderRadius:6, border:'1px solid #dfe6ea' }}>
-            <option value="">--Select Role--</option>
-            <option value="admin">Admin</option>
-            <option value="employee">Employee</option>
-            <option value="client">Client</option>
-          </select>
           <button type="submit" style={{ width:'100%', padding:12, background:'#1f6feb', color:'#fff', border:'none', borderRadius:6 }}>Register</button>
         </form>
-        <p style={{ textAlign:'center', marginTop:12, color:'#666' }}>Already have an account? <a href="/legacy/login" style={{ color: '#1f6feb', fontWeight:600 }}>Login</a></p>
+        <p style={{ textAlign:'center', marginTop:12, color:'#666' }}>Already have an account? <a href="/account/login" style={{ color: '#1f6feb', fontWeight:600 }}>Login</a></p>
       </div>
     </div>
   );
